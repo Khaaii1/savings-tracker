@@ -1,0 +1,55 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Sets the Vite base path to "/<repo-name>/" automatically so asset
+      # paths resolve correctly on https://<user>.github.io/<repo-name>/
+      - run: npm run build
+        env:
+          VITE_BASE: /${{ github.event.repository.name }}/
+      # Fails the job loudly instead of silently uploading an empty/stale
+      # artifact if the build didn't actually produce a dist/index.html.
+      - run: test -f dist/index.html || (echo "::error::dist/index.html was not built" && exit 1)
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Required so the repo's Pages settings are linked to this Actions
+      # deployment. Without this (and without Settings > Pages > Source
+      # set to "GitHub Actions"), GitHub Pages keeps serving whatever a
+      # branch-based deployment (e.g. an old `gh-pages` branch, or the
+      # raw `main` branch) last published — even while this workflow
+      # reports success, since a successful build+upload is a separate
+      # thing from Pages actually serving that artifact.
+      - uses: actions/configure-pages@v5
+      - id: deployment
+        uses: actions/deploy-pages@v4

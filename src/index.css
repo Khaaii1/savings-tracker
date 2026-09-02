@@ -1,0 +1,591 @@
+:root {
+  --paper: #f5f3ec;
+  --card: #fffefb;
+  --ink: #1c2321;
+  --ink-soft: #5b645f;
+  --ink-faint: #8b9089;
+  --line: #dbd6c7;
+  --line-strong: #c7c0ac;
+
+  --emerald: #1f5c48;
+  --emerald-soft: #e3ede6;
+  --rust: #9c4221;
+  --rust-soft: #f3e6dd;
+  --gold: #8a6d1f;
+  --gold-soft: #efe8d3;
+
+  --radius-sm: 3px;
+  --radius-md: 6px;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+button {
+  font-family: inherit;
+}
+
+input,
+select {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--emerald);
+  color: var(--card);
+}
+
+:focus-visible {
+  outline: 2px solid var(--emerald);
+  outline-offset: 2px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- layout shell ---------- */
+
+.app-shell {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 40px 24px 96px;
+}
+
+.app-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 36px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.app-header .brand {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.app-header .brand-mark {
+  color: var(--emerald);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  border: 1px solid var(--line-strong);
+  background: var(--card);
+  color: var(--ink);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.btn:hover {
+  border-color: var(--ink-soft);
+}
+
+.btn-primary {
+  background: var(--emerald);
+  border-color: var(--emerald);
+  color: var(--card);
+}
+
+.btn-primary:hover {
+  background: #17493a;
+  border-color: #17493a;
+}
+
+.btn-quiet {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 8px 10px;
+}
+
+.btn-quiet:hover {
+  color: var(--ink);
+  background: var(--line);
+}
+
+.btn-danger {
+  color: var(--rust);
+}
+
+/* ---------- hero ---------- */
+
+.hero {
+  margin-bottom: 32px;
+}
+
+.hero-statement {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3.4vw, 34px);
+  line-height: 1.25;
+  font-weight: 500;
+  max-width: 620px;
+  margin-bottom: 22px;
+}
+
+.hero-statement .figure {
+  font-weight: 600;
+}
+
+.figure-emerald {
+  color: var(--emerald);
+}
+
+.figure-rust {
+  color: var(--rust);
+}
+
+/* ---------- progress rail ---------- */
+
+.progress-rail {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.progress-rail .amount {
+  font-size: 13px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.progress-track {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  background: var(--line);
+  border-radius: 999px;
+  overflow: visible;
+}
+
+.progress-fill {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  background: var(--emerald);
+  border-radius: 999px;
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.progress-fill.is-over {
+  background: var(--gold);
+}
+
+/* ---------- stat grid ---------- */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: var(--card);
+  padding: 18px 18px 16px;
+  min-width: 0;
+}
+
+.stat-card .label {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+
+.stat-card .value {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+.stat-card .sub {
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin-top: 6px;
+}
+
+.stat-card.emphasis .value {
+  color: var(--emerald);
+}
+
+/* ---------- status pill ---------- */
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.status-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.status-pill.ahead {
+  background: var(--emerald-soft);
+  color: var(--emerald);
+}
+
+.status-pill.on-track {
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+
+.status-pill.behind {
+  background: var(--rust-soft);
+  color: var(--rust);
+}
+
+.status-pill.pending {
+  background: var(--line);
+  color: var(--ink-soft);
+}
+
+/* ---------- sections ---------- */
+
+.section {
+  margin-bottom: 32px;
+}
+
+.log-savings-form {
+  margin-bottom: 0;
+  max-width: 460px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.section-heading h2 {
+  font-size: 18px;
+}
+
+.section-note {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+/* ---------- chart ---------- */
+
+.chart-legend {
+  display: flex;
+  gap: 18px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+.chart-legend .swatch {
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* ---------- ledger table ---------- */
+
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.ledger th {
+  text-align: right;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--ink-soft);
+  padding: 0 10px 10px;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.ledger th:first-child,
+.ledger td:first-child {
+  text-align: left;
+}
+
+.ledger td {
+  padding: 11px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+}
+
+.ledger tbody tr:hover {
+  background: var(--paper);
+}
+
+.ledger .week-num {
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.ledger .diff-positive {
+  color: var(--emerald);
+}
+
+.ledger .diff-negative {
+  color: var(--rust);
+}
+
+.ledger .row-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  color: var(--ink-faint);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.icon-btn:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+
+.entry-form-row td {
+  padding-top: 6px;
+}
+
+.entry-form-row input {
+  width: 100%;
+  max-width: 140px;
+  padding: 6px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  text-align: right;
+  font-size: 14px;
+}
+
+/* ---------- savings history ---------- */
+
+.history-panel {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 4px 20px;
+}
+
+.history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.history-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.history-row:last-child {
+  border-bottom: none;
+}
+
+.history-amount {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--emerald);
+  white-space: nowrap;
+}
+
+.history-timestamp {
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+/* ---------- settings form ---------- */
+
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.field input {
+  padding: 9px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  font-size: 14.5px;
+  background: var(--card);
+  color: var(--ink);
+}
+
+.field .hint {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+/* ---------- setup screen ---------- */
+
+.setup-shell {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 72px 24px;
+}
+
+.setup-shell .eyebrow-free-title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.setup-shell p.lede {
+  color: var(--ink-soft);
+  margin: 0 0 30px;
+  max-width: 440px;
+}
+
+/* ---------- empty / footer ---------- */
+
+.empty-note {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  padding: 16px;
+  text-align: center;
+}
+
+.app-footer {
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 720px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .ledger {
+    font-size: 12.5px;
+  }
+  .ledger th,
+  .ledger td {
+    padding: 8px 6px;
+  }
+  .history-row {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .history-timestamp {
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-fill {
+    transition: none;
+  }
+}
