@@ -75,7 +75,7 @@ export default function Dashboard({ tracker }) {
     history,
     updatePlanFields,
     upsertEntry,
-    logDeposit,
+    logTransaction,
     deleteEntry,
     resetPlan,
   } = tracker;
@@ -97,7 +97,7 @@ export default function Dashboard({ tracker }) {
 
         <div style={{ marginTop: 18 }}>
           {showLogForm ? (
-            <LogSavingsForm onLog={logDeposit} onClose={() => setShowLogForm(false)} />
+            <LogSavingsForm onLog={logTransaction} onClose={() => setShowLogForm(false)} />
           ) : (
             <button className="btn btn-primary" onClick={() => setShowLogForm(true)}>
               + Log savings
@@ -162,7 +162,7 @@ export default function Dashboard({ tracker }) {
       <div className="section">
         <div className="section-heading">
           <h2>Savings history</h2>
-          <span className="section-note">Every deposit you've logged, newest first.</span>
+          <span className="section-note">Every deposit and withdrawal you've logged, newest first.</span>
         </div>
         <div className="panel history-panel">
           <SavingsHistory history={history} />

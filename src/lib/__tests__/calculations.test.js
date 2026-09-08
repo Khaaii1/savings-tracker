@@ -217,13 +217,14 @@ test("cumulativeBeforeWeek finds the most recent prior entry, or falls back to s
   assert.equal(cumulativeBeforeWeek(entries, 1, 2500), 2500); // nothing logged before week 1
 });
 
-// These tests replay the exact composition useSavingsPlan.logDeposit performs
-// (week bucketing -> baseline lookup -> add the deposit -> append a history
-// record), since that composition lives in the hook rather than in a
-// standalone function. They exist to lock in the behavior: logging a
-// deposit always *adds* to the running total, repeated deposits accumulate
-// correctly across weeks, and every deposit produces a permanent history
-// record independent of the entries/schedule bookkeeping.
+// These tests replay the exact composition useSavingsPlan.logTransaction
+// performs (week bucketing -> baseline lookup -> apply the signed amount ->
+// append a history record), since that composition lives in the hook rather
+// than in a standalone function. They exist to lock in the behavior: logging
+// a transaction always *adjusts* the running total (up for a deposit, down
+// for a negative-amount withdrawal), repeated transactions accumulate
+// correctly across weeks, and every one produces a permanent history record
+// independent of the entries/schedule bookkeeping.
 function simulateLogDeposit(plan, amount, date, timestamp = new Date().toISOString()) {
   const week = weekIndexForDate(plan.startDate, date);
   const schedule = buildSchedule({
@@ -283,12 +284,59 @@ test("logDeposit composition: a deposit in a later week builds on the prior week
   assert.equal(latestSavings(plan.entries, plan.currentSavings), 3100);
 });
 
-test("logDeposit composition: rejects non-positive amounts before ever reaching this stage (validated in the hook/UI)", () => {
-  // amountRemaining and related math never assume a negative deposit could
-  // occur; validation happens before simulateLogDeposit/logDeposit run.
-  assert.throws(() => {
-    if (!(-50 > 0)) throw new Error("Enter an amount greater than $0.");
-  });
+test("logTransaction composition: a negative amount withdraws from the running total", () => {
+  let plan = {
+    startDate: "2026-08-31",
+    deadline: "2027-04-30",
+    currentSavings: 2500,
+    targetAmount: 9000,
+    entries: [],
+  };
+  plan = simulateLogDeposit(plan, 300, "2026-09-01"); // week 1 -> 2800
+  plan = simulateLogDeposit(plan, -120, "2026-09-02"); // same week withdrawal -> 2680
+  assert.equal(latestSavings(plan.entries, plan.currentSavings), 2680);
+  assert.equal(plan.entries.length, 1); // deposit and withdrawal collapse into one weekly row
+});
+
+test("logTransaction composition: a withdrawal in a later week builds on the prior week's total", () => {
+  let plan = {
+    startDate: "2026-08-31",
+    deadline: "2027-04-30",
+    currentSavings: 2500,
+    targetAmount: 9000,
+    entries: [],
+  };
+  plan = simulateLogDeposit(plan, 300, "2026-09-01"); // week 1 -> 2800
+  plan = simulateLogDeposit(plan, -500, "2026-09-10"); // week 2 -> builds on 2800, not 2500
+  assert.equal(latestSavings(plan.entries, plan.currentSavings), 2300);
+});
+
+test("logTransaction composition: a withdrawal is stored as a signed negative history record", () => {
+  let plan = {
+    startDate: "2026-08-31",
+    deadline: "2027-04-30",
+    currentSavings: 2500,
+    targetAmount: 9000,
+    entries: [],
+    history: [],
+  };
+  plan = simulateLogDeposit(plan, 200, "2026-09-01", "2026-09-01T13:45:00.000Z");
+  plan = simulateLogDeposit(plan, -75, "2026-09-01", "2026-09-01T14:10:00.000Z");
+  assert.equal(plan.history.length, 2);
+  assert.equal(plan.history[1].amount, -75); // the sign is what marks it a withdrawal
+});
+
+test("logTransaction validation: $0 is rejected, and a withdrawal can't push the total below $0", () => {
+  // These two guards live in the hook, ahead of the composition above. This
+  // replays the same predicates so the rules stay pinned down.
+  const isValidAmount = (n) => Number.isFinite(n) && clampMoney(n) !== 0;
+  assert.equal(isValidAmount(0), false);
+  assert.equal(isValidAmount(Number("abc")), false);
+  assert.equal(isValidAmount(-50), true); // negatives are legitimate now
+
+  const baseline = 2800;
+  assert.ok(clampMoney(baseline + -3000) < 0); // overdrawing is caught before persisting
+  assert.ok(clampMoney(baseline + -2800) >= 0); // draining savings to exactly $0 is allowed
 });
 
 test("logDeposit composition: every deposit appends a permanent history record, independent of the entries/schedule", () => {
@@ -336,7 +384,8 @@ test("formatFullDateTime combines the full date and time with 'at'", () => {
   assert.match(combined, /September 1, 2026 at 1:45\s?PM/);
 });
 
-test("formatSignedCurrency always renders a leading plus sign for a deposit amount", () => {
+test("formatSignedCurrency signs by direction: plus for a deposit, minus for a withdrawal", () => {
   assert.equal(formatSignedCurrency(50), "+$50.00");
-  assert.equal(formatSignedCurrency(-50), "+$50.00"); // history amounts are always positive deposits
+  assert.equal(formatSignedCurrency(-50), "-$50.00");
+  assert.equal(formatSignedCurrency(0), "+$0.00");
 });

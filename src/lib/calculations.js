@@ -246,19 +246,19 @@ export function formatFullDateTime(timestamp) {
   return `${formatFullDate(timestamp)} at ${formatTime(timestamp)}`;
 }
 
-/** e.g. "+$50.00" — history entries are always positive deposits, and
- * always show cents (unlike `formatCurrency`, which drops them for whole
- * dollar amounts elsewhere in the app), since a per-transaction log reads
- * more like a receipt.
+/** e.g. "+$50.00" for a deposit, "-$50.00" for a withdrawal. Always shows
+ * cents (unlike `formatCurrency`, which drops them for whole dollar amounts
+ * elsewhere in the app), since a per-transaction log reads more like a
+ * receipt.
  */
 export function formatSignedCurrency(n) {
-  const amount = Math.abs(Number(n) || 0);
-  const formatted = amount.toLocaleString("en-US", {
+  const value = Number(n) || 0;
+  const formatted = Math.abs(value).toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-  return `+${formatted}`;
+  return `${value < 0 ? "-" : "+"}${formatted}`;
 }
 

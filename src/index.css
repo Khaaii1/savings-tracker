@@ -468,10 +468,52 @@ select {
   white-space: nowrap;
 }
 
+.history-amount.is-withdrawal {
+  color: var(--rust);
+}
+
 .history-timestamp {
   font-size: 13px;
   color: var(--ink-soft);
   text-align: right;
+}
+
+/* ---------- deposit / withdrawal toggle ---------- */
+
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  margin-bottom: 18px;
+  background: var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.segmented-option {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--radius-sm) - 2px);
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.segmented-option:hover {
+  color: var(--ink);
+}
+
+.segmented-option.is-active {
+  background: var(--card);
+  color: var(--emerald);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.segmented-option.is-active.is-withdrawal {
+  color: var(--rust);
 }
 
 /* ---------- settings form ---------- */
