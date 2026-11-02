@@ -24,6 +24,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - run: npm test
       # Sets the Vite base path to "/<repo-name>/" automatically so asset
       # paths resolve correctly on https://<user>.github.io/<repo-name>/
       - run: npm run build
